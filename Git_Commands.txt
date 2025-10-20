@@ -12,4 +12,4 @@ repository.
 git pull origin <branch name>: Pulls changes from the remote
 repository. 
 
-This file was created by Malak Alsahn on October 10 2025
+This file was created by Malak Alsahn on October 10 2025.
