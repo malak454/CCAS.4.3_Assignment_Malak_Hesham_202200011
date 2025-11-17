@@ -1,0 +1,190 @@
+Malak Hesham Alsahn - 202200011
+CCAS.4.3 Assignment 3
+My GITHUB rep: https://github.com/malak454/CCAS.4.3_Assignment_Malak_Hesham_202200011
+
+
+Create table AIRPORT (
+    Airport_code CHAR(3) PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    City VARCHAR(50),
+    State VARCHAR(50)
+    );
+    
+Create table FLIGHT (
+    Flight_number VARCHAR(10) PRIMARY KEY,
+    Airline VARCHAR(50) not null,
+    Weekdays VARCHAR(30)
+    );
+    
+create table AIRPLANE_TYPE (
+    Airplane_type_name VARCHAR(50) PRIMARY KEY,
+    Max_seats INT not null,
+    Company VARCHAR(50)
+    );
+    
+    create table AIRPLANE (
+    Airplane_id INT PRIMARY KEY,
+    Total_number_of_seats INT not null,
+    Airplane_type VARCHAR(50) not null,
+    CONSTRAINT fk_airplane_type
+        FOREIGN KEY (Airplane_type)
+        REFERENCES AIRPLANE_TYPE (Airplane_type_name)
+);
+CREATE TABLE FLIGHT_LEG (
+    Flight_number VARCHAR(10) NOT NULL,
+    Leg_number INT NOT NULL,
+    Departure_airport_code CHAR(3) NOT NULL,
+    Scheduled_departure_time VARCHAR2(10)  NOT NULL,
+    Arrival_airport_code   CHAR(3) NOT NULL,
+    Scheduled_arrival_time VARCHAR2(10) NOT NULL,
+    CONSTRAINT pk_flight_leg
+        PRIMARY KEY (Flight_number, Leg_number),
+    CONSTRAINT fk_fl_flight
+        FOREIGN KEY (Flight_number)
+        REFERENCES FLIGHT (Flight_number),
+    CONSTRAINT fk_fl_dep_airport
+        FOREIGN KEY (Departure_airport_code)
+        REFERENCES AIRPORT (Airport_code),
+    CONSTRAINT fk_fl_arr_airport
+        FOREIGN KEY (Arrival_airport_code)
+        REFERENCES AIRPORT (Airport_code)
+);
+
+CREATE TABLE FARE (
+    Flight_number VARCHAR(10) NOT NULL,
+    Fare_code VARCHAR(10) NOT NULL,
+    Amount DECIMAL(8,2) NOT NULL,
+    Restrictions  VARCHAR(200),
+    CONSTRAINT pk_fare
+        PRIMARY KEY (Flight_number, Fare_code),
+    CONSTRAINT fk_fare_flight
+        FOREIGN KEY (Flight_number)
+        REFERENCES FLIGHT (Flight_number)
+);
+
+CREATE TABLE LEG_INSTANCE (
+    Flight_number VARCHAR(10) NOT NULL,
+    Leg_number INT NOT NULL,
+    Day_Date DATE not null,
+    Number_of_available_seats INT NOT NULL,
+    Airplane_id INT NOT NULL,
+    Departure_airport_code CHAR(3)NOT NULL,
+    Departure_time VARCHAR2(10) NOT NULL,
+    Arrival_airport_code CHAR(3)NOT NULL,
+    Arrival_time VARCHAR2(10) NOT NULL,
+    CONSTRAINT pk_leg_instance
+        PRIMARY KEY (Flight_number, Leg_number, Day_Date),
+    CONSTRAINT fk_li_flight_leg
+        FOREIGN KEY (Flight_number, Leg_number)
+        REFERENCES FLIGHT_LEG (Flight_number, Leg_number),
+    CONSTRAINT fk_li_airplane
+        FOREIGN KEY (Airplane_id)
+        REFERENCES AIRPLANE (Airplane_id),
+    CONSTRAINT fk_li_dep_airport
+        FOREIGN KEY (Departure_airport_code)
+        REFERENCES AIRPORT (Airport_code),
+    CONSTRAINT fk_li_arr_airport
+        FOREIGN KEY (Arrival_airport_code)
+        REFERENCES AIRPORT (Airport_code)
+);
+
+CREATE TABLE SEAT_RESERVATION (
+    Flight_number VARCHAR(10)NOT NULL,
+    Leg_number INT NOT NULL,
+    Day_Date DATE NOT NULL,
+    Seat_number VARCHAR(5) NOT NULL,
+    Customer_name VARCHAR(100)NOT NULL,
+    Customer_phone VARCHAR(20),
+    CONSTRAINT pk_seat_res
+        PRIMARY KEY (Flight_number, Leg_number, Day_Date, Seat_number),
+    CONSTRAINT fk_sr_leg_instance
+        FOREIGN KEY (Flight_number, Leg_number, Day_Date)
+        REFERENCES LEG_INSTANCE (Flight_number, Leg_number, Day_Date)
+);
+
+INSERT INTO AIRPORT VALUES('JFK','John F. Kennedy Intl','New York','USA');
+INSERT INTO AIRPORT VALUES('DXB','Dubai Intl Airport','Dubai','UAE');
+INSERT INTO AIRPORT VALUES('SIN','Changi Airport','Singapore','Singapore');
+INSERT INTO AIRPORT VALUES('CDG','Charles de Gaulle','Paris','France');
+
+INSERT INTO FLIGHT VALUES('AF007','Air France','Monday');
+INSERT INTO FLIGHT VALUES('DL123','Delta Airlines','Sunday');
+INSERT INTO FLIGHT VALUES('EK201','Emirates','Monday');
+INSERT INTO FLIGHT VALUES('SQ322','Singapore Airlines','Thursday');
+
+INSERT INTO AIRPLANE_TYPE VALUES('Boeing 777',396,'Boeing');
+INSERT INTO AIRPLANE_TYPE VALUES('Airbus A380',500,'Airbus');
+INSERT INTO AIRPLANE_TYPE VALUES('Boeing 787',280,'Boeing');
+INSERT INTO AIRPLANE_TYPE VALUES('Airbus A350',325,'Airbus');
+
+INSERT INTO AIRPLANE VALUES(101,396,'Boeing 777');
+INSERT INTO AIRPLANE VALUES(102,500,'Airbus A380');
+INSERT INTO AIRPLANE VALUES(103,280,'Boeing 787');
+INSERT INTO AIRPLANE VALUES(104,325,'Airbus A350');
+
+INSERT INTO FLIGHT_LEG VALUES('EK201',1,'DXB','08:00','JFK','14:30');
+INSERT INTO FLIGHT_LEG VALUES('SQ322',1,'SIN','23:00','CDG','06:20');
+INSERT INTO FLIGHT_LEG VALUES('AF007',1,'CDG','10:15','JFK','12:55');
+INSERT INTO FLIGHT_LEG VALUES('DL123',1,'JFK','17:00','CDG','06:40');
+
+INSERT INTO FARE VALUES('EK201','ECON',850.00,'Non-refundable');
+INSERT INTO FARE VALUES('SQ322','BUS',2200.00,'Refundable');
+INSERT INTO FARE VALUES('AF007','PREM',1500.00,'Change fee applies');
+INSERT INTO FARE VALUES('DL123','ECON',700.00,'No restrictions');
+
+INSERT INTO LEG_INSTANCE VALUES('EK201',1,DATE '2025-01-06',150,101,'DXB','08:00','JFK','14:30');
+INSERT INTO LEG_INSTANCE VALUES('SQ322',1,DATE '2025-01-06',200,102,'SIN','23:00','CDG','06:20');
+INSERT INTO LEG_INSTANCE VALUES('AF007',1,DATE '2025-01-06',120,103,'CDG','10:15','JFK','12:55');
+INSERT INTO LEG_INSTANCE VALUES('DL123',1,DATE '2025-01-06',180,104,'JFK','17:00','CDG','06:40');
+
+INSERT INTO SEAT_RESERVATION VALUES('EK201',1,DATE '2025-01-06','12A','Ahmed Ali','01012345678');
+INSERT INTO SEAT_RESERVATION VALUES('SQ322',1,DATE '2025-01-06','4K','Sara Lim','+6588881234');
+INSERT INTO SEAT_RESERVATION VALUES('AF007',1,DATE '2025-01-06','7D','Pierre Dupont','0612345678');
+INSERT INTO SEAT_RESERVATION VALUES ('DL123',1,DATE '2025-01-06','22F','John Smith','2125558923');
+
+/*Question 1 a*/
+SELECT * FROM FLIGHT ORDER by AIRLINE;
+
+/*Question 1 b*/
+SELECT Restrictions, Amount,(Amount *1.15) AS Amount_After_Taxes 
+from FARE WHERE Amount > 1000; /*I used 1000 instead of 50 as my data uses bigger numbers */
+
+/* Question 1 c: both codes are not workking for me
+delete top(5) percent from SEAT_RESERVATION;
+
+DELETE FROM SEAT_RESERVATION
+LIMIT (SELECT COUNT(*) * 0.05 FROM SEAT_RESERVATION);*/ 
+
+/*Question 1 d:*/
+select Airplane_type_name, Max_seats from AIRPLANE_TYPE;
+
+/*Question 1 e:*/
+INSERT INTO AIRPLANE_TYPE VALUES('Example T',325,'Additional');
+SELECT Airplane_type_name FROM AIRPLANE_TYPE
+WHERE Airplane_type_name LIKE 'E%T';
+
+/*Question 1 f:*/
+SELECT F.Flight_number,
+dep.Name AS Departure_airport, arr.Name AS Arrival_airport,
+fl.Scheduled_departure_time, fl.Scheduled_arrival_time,
+atp.Airplane_type_name
+FROM FLIGHT F
+JOIN FLIGHT_LEG fl ON fl.Flight_number = F.Flight_number
+JOIN AIRPORT dep ON dep.Airport_code = fl.Departure_airport_code
+JOIN AIRPORT arr ON arr.Airport_code = fl.Arrival_airport_code
+JOIN LEG_INSTANCE li ON li.Flight_number = fl.Flight_number AND li.Leg_number    = fl.Leg_number
+JOIN AIRPLANE AIR ON AIR.Airplane_id = li.Airplane_id
+JOIN AIRPLANE_TYPE atp ON atp.Airplane_type_name = AIR.Airplane_type
+WHERE F.Weekdays LIKE '%Monday%';
+
+/*Question 1 j*/
+SELECT
+F.Flight_number, F.Airline,
+dep.Name AS Departure_airport, arr.Name AS Arrival_airport,
+fl.Scheduled_departure_time, fl.Scheduled_arrival_time
+FROM FLIGHT F
+JOIN FLIGHT_LEG fl ON F.Flight_number = fl.Flight_number
+JOIN AIRPORT dep ON fl.Departure_airport_code = dep.Airport_code
+JOIN AIRPORT arr ON fl.Arrival_airport_code = arr.Airport_code
+WHERE F.Airline LIKE '%Air%';
+
